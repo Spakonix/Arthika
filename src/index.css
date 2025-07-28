@@ -1,0 +1,17 @@
+
+body {
+  margin: 0;
+  font-family: 'Mukta', sans-serif;
+  background: linear-gradient(to bottom, #ffe6f0, #e0f7ff);
+}
+* {
+  box-sizing: border-box;
+}
+.fade-text {
+  transition: opacity 0.5s ease-in-out;
+  animation: fadeInOut 2s infinite;
+}
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
