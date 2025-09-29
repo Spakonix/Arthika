@@ -1,4 +1,5 @@
 // src/pages/WelcomePage.js
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -36,10 +37,11 @@ const WelcomePage = ({ onLanguageSelect }) => {
       setIndex((prev) => (prev + 1) % messages.length);
     }, 2000);
     return () => clearInterval(interval);
-  }, []);
+  }, [messages.length]);
 
   const handleClick = (lang) => {
-    onLanguageSelect(lang);
+    // This calls the handler in App.js, which saves to Local Storage
+    onLanguageSelect(lang); 
     navigate('/login');
   };
 
