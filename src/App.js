@@ -5,6 +5,8 @@ import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
 import RegisterPage from './pages/RegisterPage';
 import LearnPage from './pages/LearnPage';
+import InvestPage from './pages/InvestPage';
+import ProfilePage from './pages/ProfilePage';
 
 function App() {
   // CRITICAL FIX: Initialize state by checking Local Storage first for persistence.
