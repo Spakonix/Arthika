@@ -90,6 +90,7 @@ const WelcomePage = ({ onLanguageSelect, texts, initialLang }) => {
     return () => clearInterval(interval);
   }, []);
 
+  
   const handleClick = (lang) => {
     onLanguageSelect(lang);
     navigate('/login');

@@ -1,24 +1,18 @@
-// src/pages/HomePage.js
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-// --- ARTHIKA COLOR PALETTE ---
-const COLORS = {
-    primary: '#F48FB1', // Pink
-    secondary: '#FBC02D', // Gold/Yellow
-    background: '#FFF9F1', // Off-White/Cream
-    dark: '#333333', // Dark Gray/Text
-    accentPurple: '#6B46C1', // Deep Purple
-    accentGreen: '#38A169', // Medium Green
-    whiteText: '#FFFFFF',
-    softYellow: '#FBC02D1A',
-};
-// Check the path here: should be '../translations' if translations.js is in src/
-import { translations } from '../translations'; 
-
 const HomePage = ({ user, language }) => {
   const navigate = useNavigate();
+useEffect(() => {
+  const script = document.createElement('script');
+  // script.src = '//code.tidio.co/le88gc5puadgxjfxg9pzkxpjm7mygnxm.js';
+  script.async = true;
+  document.body.appendChild(script);
+
+  return () => {
+    document.body.removeChild(script);
+  };
+}, []);
   const t = (en, hi, mr, gu, bn, te, ta, pa, ml, ur) => {
     switch (language) {
       case 'hi': return hi;
