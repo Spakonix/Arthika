@@ -3,6 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
+const bcrypt = require('bcryptjs'); // For password hashing
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -11,7 +12,7 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// MongoDB
+// MongoDB connection
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -24,11 +25,11 @@ mongoose.connect(process.env.MONGO_URI, {
 
 // Schema
 const userSchema = new mongoose.Schema({
-  name: String,
-  phone: String,
+  name: { type: String, required: true },
+  phone: { type: String, required: true },
   age: Number,
   email: String,
-  password: String,
+  password: { type: String, required: true },
   language: String,
 });
 
@@ -36,41 +37,61 @@ const User = mongoose.model('User', userSchema);
 
 // Register
 app.post('/api/users/register', async (req, res) => {
-  const { name, phone } = req.body;
+  const { name, phone, password } = req.body;
+
+  if (!name || !phone || !password) {
+    return res.status(400).json({ success: false, message: 'Name, phone and password are required' });
+  }
 
   try {
     const existingUser = await User.findOne({ name, phone });
     if (existingUser) {
-      return res.json({ success: false, message: 'User already exists' });
+      return res.status(400).json({ success: false, message: 'User already exists' });
     }
 
-    await new User(req.body).save();
-    res.json({ success: true });
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = new User({ ...req.body, password: hashedPassword });
+    await newUser.save();
+
+    res.status(201).json({ success: true, message: 'User registered successfully' });
   } catch (err) {
-    res.status(500).json({ success: false });
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 
 // Login
 app.post('/api/users/login', async (req, res) => {
-  const { name, phone } = req.body;
+  const { name, phone, password } = req.body;
+
+  if (!name || !phone || !password) {
+    return res.status(400).json({ success: false, message: 'Name, phone and password are required' });
+  }
 
   try {
     const user = await User.findOne({ name, phone });
-    if (user) res.json({ success: true, user });
-    else res.json({ success: false, message: 'User not found' });
-  } catch {
-    res.status(500).json({ success: false });
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+    // Compare password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(401).json({ success: false, message: 'Invalid credentials' });
+
+    res.json({ success: true, user });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 
-// React build
+// Serve React build
 app.use(express.static(path.join(__dirname, '../build')));
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../build/index.html'));
+  res.sendFile(path.join(__dirname, '../build', 'index.html'));
 });
 
-
+// Start server
 app.listen(PORT, () => {
   console.log(`✅ Server running at http://localhost:${PORT}`);
 });
