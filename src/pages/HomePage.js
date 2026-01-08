@@ -1,184 +1,309 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { translations } from '../translations'; 
+
+// --- ORIGINAL VIBRANT COLOR PALETTE (Restored) ---
+const COLORS = {
+  // Base Palette (from 1000263365.jpg & Screenshot 2025-09-28 184611.png)
+  offWhite: '#FFF9F1',      // Main Background / Card Background
+  yellow: '#FBC02D',        // Secondary Accent (XP, Progress Bar Fill, Invest button)
+  pink: '#F48FB1',          // Accent (Community button)
+  darkGrey: '#333333',      // Text, Profile button
+  
+  // Derived Colors
+  primaryPurple: '#4B0082', // Deep Purple (Header Background, Learn button)
+  lightPink: 'rgba(244, 143, 177, 0.15)', // Light version of pink for Tip background
+  textWhite: '#FFFFFF',
+  success: '#66bb6a',       // Green (for task completion checkmarks)
+  lightBorder: '#E0E0E0',
+};
 
 const HomePage = ({ user, language }) => {
   const navigate = useNavigate();
-useEffect(() => {
-  const script = document.createElement('script');
-  // script.src = '//code.tidio.co/le88gc5puadgxjfxg9pzkxpjm7mygnxm.js';
-  script.async = true;
-  document.body.appendChild(script);
 
-  return () => {
-    document.body.removeChild(script);
-  };
-}, []);
-  const t = (en, hi, mr, gu, bn, te, ta, pa, ml, ur) => {
-    switch (language) {
-      case 'hi': return hi;
-      case 'mr': return mr;
-      case 'gu': return gu;
-      case 'bn': return bn;
-      case 'te': return te;
-      case 'ta': return ta;
-      case 'pa': return pa;
-      case 'ml': return ml;
-      case 'ur': return ur;
-      default: return en;
-    }
+  const currentLang = translations[language] || translations.en;
+  const t = (key) => currentLang[key] || translations.en[key] || '';
+
+  const currentXP = 1250;
+  const maxXP = 1500;
+  const level = 3;
+  const progressPercent = (currentXP / maxXP) * 100;
+  const userName = user?.name || t('guest_name');
+
+  useEffect(() => {
+    const script = document.createElement('script');
+    // script.src = '//code.tidio.co/le88gc5puadgxjfxg9pzkxpjm7mygnxm.js';
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
+  const styles = {
+    // --- Global Container & Background ---
+    container: {
+      padding: 20,
+      backgroundColor: COLORS.offWhite, // FFF9F1
+      fontFamily: 'sans-serif',
+      minHeight: '100vh',
+      color: COLORS.darkGrey,
+    },
+
+    // --- 1. Header Section (Deep Purple) ---
+    header: {
+      backgroundColor: COLORS.primaryPurple, // 4B0082
+      color: COLORS.textWhite,
+      borderRadius: 20,
+      padding: 20,
+      marginBottom: 20,
+      boxShadow: '0 4px 10px rgba(0,0,0,0.15)',
+    },
+    headerTop: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    greetingText: {
+      fontSize: 22,
+      fontWeight: 'bold',
+      margin: 0,
+    },
+    readyText: {
+      fontSize: 14,
+      opacity: 0.9,
+      margin: '5px 0 10px 0',
+    },
+    streak: {
+      display: 'flex',
+      alignItems: 'center',
+      fontWeight: 'bold',
+      fontSize: 18,
+    },
+    fireIcon: {
+      color: COLORS.yellow, // FBC02D
+      fontSize: 20,
+      marginRight: 4,
+    },
+
+    // Progress Bar
+    progressContainer: {
+      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+      borderRadius: 10,
+      height: 10,
+      overflow: 'hidden',
+    },
+    progressBarFill: {
+      backgroundColor: COLORS.yellow, // FBC02D
+      height: '100%',
+      borderRadius: 10,
+      transition: 'width 0.5s ease-in-out',
+    },
+    progressDetails: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      marginTop: 5,
+      fontSize: 12,
+    },
+
+    // --- 2. Tasks Section ---
+    taskSection: {
+      backgroundColor: COLORS.textWhite, 
+      borderRadius: 15,
+      padding: 20,
+      marginBottom: 20,
+      boxShadow: '0 2px 5px rgba(0,0,0,0.05)',
+    },
+    taskHeading: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      marginBottom: 10,
+      color: COLORS.darkGrey, // 333333
+    },
+    taskItem: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      padding: '10px 0',
+      borderBottom: `1px solid ${COLORS.lightBorder}`,
+      fontSize: 15,
+      cursor: 'pointer',
+      transition: 'background-color 0.2s',
+    },
+    taskText: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 10,
+    },
+    taskXP: {
+      color: COLORS.darkGrey, // 333333
+      fontWeight: 'bold',
+      fontSize: 14,
+    },
+
+    // --- 3. Tip Section (Pink Accent Background) ---
+    tipSection: {
+      backgroundColor: COLORS.lightPink, // Light version of F48FB1
+      borderRadius: 15,
+      padding: 20,
+      marginBottom: 20,
+      boxShadow: '0 2px 5px rgba(0,0,0,0.03)',
+    },
+    tipText: {
+      fontSize: 15,
+      fontStyle: 'italic',
+      color: COLORS.darkGrey, // 333333
+      margin: 0,
+      lineHeight: 1.4,
+    },
+
+    // --- 4. Navigation Grid ---
+    buttonGrid: {
+      display: 'grid',
+      gridTemplateColumns: '1fr 1fr',
+      gap: 15,
+    },
+    navButton: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      height: 100,
+      borderRadius: 15,
+      fontSize: 16,
+      fontWeight: 'bold',
+      cursor: 'pointer',
+      border: 'none',
+      boxShadow: '0 4px 8px rgba(0,0,0,0.15)',
+      transition: 'transform 0.2s',
+      color: COLORS.textWhite,
+      '&:hover': { transform: 'scale(1.03)' },
+    },
+    navIcon: {
+      fontSize: 30,
+      marginBottom: 8,
+    },
   };
 
-  const images = [
-    'https://media.istockphoto.com/id/1126454593/photo/rural-women-using-mobile-phone-in-agricultural-field.jpg?s=612x612&w=0&k=20&c=FioJqMLiZNgpeRweWtNRipR7TG_rF-fqki1ylk6ya-Y=',
-    'https://media.istockphoto.com/id/1125843657/photo/rural-women-using-mobile-phone-at-village.jpg?s=612x612&w=0&k=20&c=E7QFCKFAOCFAf5_eEYa8jKPayKT1twnnRlIc-AvuSMo=',
-    'https://media.istockphoto.com/id/1309084086/photo/rural-women-using-phone-in-villlage.jpg?s=612x612&w=0&k=20&c=U-m5YS4jVAva2iErd10TAcOYWut2IZgu5P89ysOKR1s=',
-    'https://media.istockphoto.com/id/1125873451/photo/rural-women-using-mobile-phone-at-village.jpg?s=612x612&w=0&k=20&c=Wz1ZDufJf-tZFgp1mAsIP8tySsoEs48Mmtpny6MboEo='
-  ];
+  const handleTaskClick = (taskKey) => {
+    // This logic simulates completing a task and collects XP
+    if (taskKey === 'watch_lesson_task' || taskKey === 'take_quiz_task') navigate('/learn');
+    else if (taskKey === 'check_portfolio_task') navigate('/invest');
+    
+    alert(`Task '${t(taskKey)}' initiated!`);
+  };
 
   return (
-    <div style={styles.cont}>
-      <h1 style={styles.h1}>Arthika</h1>
-      <h3 style={styles.h3}>
-        {t(
-          `Namaste, ${user?.name || 'Guest'}`,
-          `नमस्ते, ${user?.name || 'अतिथि'}`,
-          `नमस्कार, ${user?.name || 'अतिथी'}`,
-          `નમસ્તે, ${user?.name || 'મહેમાન'}`,
-          `নমস্কার, ${user?.name || 'অতিথি'}`,
-          `నమస్తే, ${user?.name || 'అతిథి'}`,
-          `வணக்கம், ${user?.name || 'விருந்தினர்'}`,
-          `ਸਤ ਸ੍ਰੀ ਅਕਾਲ, ${user?.name || 'ਮੇਹਮਾਨ'}`,
-          `നമസ്കാരം, ${user?.name || 'അതിഥി'}`,
-          `نمستے، ${user?.name || 'مہمان'}`
-        )}
-      </h3>
-      <h4 style={styles.sub}>
-        {t(
-          'Aapka paisa, aapka faisla',
-          'आपका पैसा, आपका फैसला',
-          'आपला पैसा, आपला निर्णय',
-          'તમારા પૈસા, તમારો નિર્ણય',
-          'আপনার টাকা, আপনার সিদ্ধান্ত',
-          'మీ డబ్బు, మీ నిర్ణయం',
-          'உங்கள் பணம், உங்கள் முடிவு',
-          'ਤੁਹਾਡਾ ਪੈਸਾ, ਤੁਹਾਡਾ ਫੈਸਲਾ',
-          'നിങ്ങളുടെ പണം, നിങ്ങളുടെ തീരുമാനമാണ്',
-          'آپ کا پیسہ، آپ کا فیصلہ'
-        )}
-      </h4>
-
-      <div style={styles.btns}>
-        <button style={styles.btn}>
-          {t(
-            'Learn Financial Security',
-            'वित्तीय जानकारी सीखें',
-            'आर्थिक शिक्षण',
-            'નાણાકીય જ્ઞાન શikho',
-            'আর্থিক নিরাপত্তা শিখুন',
-            'ఆర్థిక భద్రత నేర్చుకోండి',
-            'நிதி பாதுகாப்பை அறிக',
-            'ਵਿੱਤੀ ਸੁਰੱਖਿਆ ਸਿੱਖੋ',
-            'സാമ്പത്തിക സുരക്ഷ പഠിക്കുക',
-            'مالی تحفظ سیکھیں'
-          )}
-        </button>
-        <button style={styles.btn}>
-          {t(
-            'Link Bank Account',
-            'बैंक खाता जोड़ें',
-            'बँक खाते लिंक करा',
-            'બેંક ખાતું જોડો',
-            'ব্যাংক অ্যাকাউন্ট যুক্ত করুন',
-            'బ్యాంక్ ఖాతాను లింక్ చేయండి',
-            'வங்கி கணக்கை இணைக்கவும்',
-            'ਬੈਂਕ ਖਾਤਾ ਜੋੜੋ',
-            'ബാങ്ക് അക്കൗണ്ട് ബന്ധിപ്പിക്കുക',
-            'بینک اکاؤنٹ لنک کریں'
-          )}
-        </button>
-        <button style={styles.btn}>
-          {t(
-            'Open Chat Assistant',
-            'चैट सहायक खोलें',
-            'चॅट सहाय्यक उघडा',
-            'ચેટ સહાયક ખોલો',
-            'চ্যাট সহকারী খুলুন',
-            'చాట్ అసిస్టెంట్ తెరవండి',
-            'அரட்டை உதவியாளரை திறக்கவும்',
-            'ਚੈਟ ਸਹਾਇਕ ਖੋਲ੍ਹੋ',
-            'ചാറ്റ് അസിസ്റ്റന്റ് തുറക്കുക',
-            'چیٹ اسسٹنٹ کھولیں'
-          )}
-        </button>
-        <button
-          style={{ ...styles.btn, background: '#f99fbf' }}
-          onClick={() => navigate('/register')}
-        >
-          {t(
-            'Register Now',
-            'अभी पंजीकरण करें',
-            'नोंदणी करा',
-            'હમણાં જ નોંધણી કરો',
-            'এখনই নিবন্ধন করুন',
-            'ఇప్పుడు నమోదు చేయండి',
-            'இப்போது பதிவு செய்யவும்',
-            'ਹੁਣੇ ਰਜਿਸਟਰ ਕਰੋ',
-            'ഇപ്പോൾ രജിസ്റ്റർ ചെയ്യൂ',
-            'ابھی رجسٹر کریں'
-          )}
-        </button>
+    <div style={styles.container}>
+      
+      {/* 1. Top Header Section */}
+      <div style={styles.header}>
+        <div style={styles.headerTop}>
+          <p style={styles.greetingText}>
+            {(t('welcome_message') || 'Good morning, Priya!').replace('Priya', userName)}
+          </p>
+          <div style={styles.streak}>
+            <span style={styles.fireIcon}>🔥</span> 7
+          </div>
+        </div>
+        <p style={styles.readyText}>{t('grow_wealth_question')}</p>
+        
+        {/* Progress Bar */}
+        <div style={styles.progressContainer}>
+          <div style={{ ...styles.progressBarFill, width: `83.33%` }}></div>
+        </div>
+        <div style={styles.progressDetails}>
+          <span>{t('level')} 3</span>
+          <span>1250/1500 XP</span>
+        </div>
       </div>
 
-      <div style={styles.collage}>
-        {images.map((url, index) => (
-          <img key={index} src={url} alt="rural woman" style={styles.img} />
-        ))}
+      {/* 2. Today's Tasks Section */}
+      <div style={styles.taskSection}>
+        <h3 style={styles.taskHeading}>{t('todays_tasks_heading')}</h3>
+        <div style={styles.taskList}>
+          
+          {/* Task 1: Watch Lesson */}
+          <div 
+            style={styles.taskItem} 
+            onClick={() => handleTaskClick('watch_lesson_task')}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.02)'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+          >
+            <div style={styles.taskText}>
+              <span style={{ color: COLORS.success }}>▶️</span> {t('watch_lesson_task')}
+            </div>
+            <span style={styles.taskXP}>+50 XP</span>
+          </div>
+          
+          {/* Task 2: Take a Quiz */}
+          <div 
+            style={styles.taskItem} 
+            onClick={() => handleTaskClick('take_quiz_task')}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.02)'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+          >
+            <div style={styles.taskText}>
+              <span style={{ color: COLORS.success }}>✅</span> {t('take_quiz_task')}
+            </div>
+            <span style={styles.taskXP}>+30 XP</span>
+          </div>
+          
+          {/* Task 3: Check Portfolio */}
+          <div 
+            style={{...styles.taskItem, borderBottom: 'none'}} 
+            onClick={() => handleTaskClick('check_portfolio_task')}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.02)'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+          >
+            <div style={styles.taskText}>
+              <span style={{ color: COLORS.success }}>📈</span> {t('check_portfolio_task')}
+            </div>
+            <span style={styles.taskXP}>+20 XP</span>
+          </div>
+          
+        </div>
       </div>
+
+      {/* 3. Finance Tip of the Day */}
+      <div style={styles.tipSection}>
+        <p style={styles.tipText}>
+          "{t('finance_tip_quote')}"
+        </p>
+      </div>
+
+      {/* 4. Navigation Grid */}
+      <div style={styles.buttonGrid}>
+        
+        {/* LEARN Button (Primary Purple) */}
+        <button style={{ ...styles.navButton, backgroundColor: COLORS.primaryPurple }} onClick={() => navigate('/learn')}>
+          <span style={styles.navIcon}>📖</span>
+          {t('learn_button')}
+        </button>
+        
+        {/* INVEST Button (Yellow/Gold) */}
+        <button style={{ ...styles.navButton, backgroundColor: COLORS.yellow, color: COLORS.darkGrey }} onClick={() => navigate('/invest')}>
+          <span style={styles.navIcon}>📈</span>
+          {t('invest_button')}
+        </button>
+        
+        {/* COMMUNITY Button (Pink) */}
+        <button style={{ ...styles.navButton, backgroundColor: COLORS.pink, color: COLORS.textWhite }} onClick={() => navigate('/community')}>
+          <span style={styles.navIcon}>👥</span>
+          {t('community_button')}
+        </button>
+        
+        {/* PROFILE Button (Dark Grey) */}
+        <button style={{ ...styles.navButton, backgroundColor: COLORS.darkGrey, color: COLORS.textWhite }} onClick={() => navigate('/profile')}>
+          <span style={styles.navIcon}>👤</span>
+          {t('profile_button')}
+        </button>
+        
+      </div>
+      
     </div>
   );
-};
-
-const styles = {
-  cont: {
-    padding: 20,
-    background: 'linear-gradient(to bottom, #ffe6f0, #e0f7ff)',
-    textAlign: 'center',
-    minHeight: '100vh',
-  },
-  h1: { fontSize: 36, margin: 0, color: '#333' },
-  h3: { fontSize: 22, margin: '10px 0', color: '#222' },
-  sub: { fontSize: 18, marginBottom: 20, color: '#555' },
-  btns: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: 14,
-    marginTop: 20,
-  },
-  btn: {
-    padding: '12px 20px',
-    width: 250,
-    border: '1px solid #aaa',
-    borderRadius: 10,
-    color: '#000',
-    background: '#fff',
-    fontSize: 16,
-    cursor: 'pointer',
-    transition: 'all 0.3s ease-in-out',
-  },
-  collage: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-    gap: 10,
-    marginTop: 30,
-    padding: 10,
-  },
-  img: {
-    width: '100%',
-    height: 120,
-    objectFit: 'cover',
-    borderRadius: 8,
-  },
 };
 
 export default HomePage;

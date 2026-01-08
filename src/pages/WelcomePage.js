@@ -12,13 +12,12 @@ const COLORS = {
     secondary: '#FBC02D', // Gold/Yellow (Title/Accent/Login Button)
     primary: '#F48FB1', // Pink (Accents)
     dark: '#333333', // Dark Gray/Text
-    accentPurple: '#6B46C1', // Deep Purple (Get Started/Primary CTA - Professional tone)
+    accentPurple: '#6B46C1', // Deep Purple (Get Started/Primary CTA)
     whiteText: '#FFFFFF',
     softYellow: '#FBC02D1A', // Lightened secondary for subtle background gradient
 };
 
-// Placeholder Text Object (Expected to be passed down from App.jsx)
-// This is used for demonstrating the immediate language change.
+// --- DUMMY TEXTS for the second phase ---
 const DUMMY_LANG_TEXTS = {
     hi: {
         getStarted: "शुरू करें",
@@ -34,28 +33,28 @@ const DUMMY_LANG_TEXTS = {
         welcomeTitle: "Your journey to financial freedom starts here",
         welcomeTagline: "Join to build a secure future.",
     },
-    // Add other languages as needed for proper preview
     gu: {
         getStarted: "શરૂ કરો",
         login: "લોગ ઇન",
         chooseLanguage: "તમારી ભાષા પસંદ કરો",
         welcomeTitle: "તમારી નાણાકીય સ્વતંત્રતાની યાત્રા અહીંથી શરૂ થાય છે",
         welcomeTagline: "સુરક્ષિત ભવિષ્યનું નિર્માણ કરવા જોડાઓ.",
-    }
-    // ... all other languages must be handled by the parent component (App.jsx)
+    },
+    // IMPORTANT: Add all other languages (mr, bn, te, ta, pa, ml, ur) here!
 };
 
-const WelcomePage = ({ onLanguageSelect, texts, initialLang }) => {
-    // FIX: Initialize useNavigate hook here to define the 'navigate' function.
+const WelcomePage = ({ onLanguageSelect, initialLang }) => {
     const navigate = useNavigate();
 
-    // We use local state to track if a language has been selected to show the buttons.
-    // Use the passed 'texts' prop if available, otherwise default to a dummy object for preview.
-    const langTexts = texts || DUMMY_LANG_TEXTS[initialLang || 'en'];
-
+    // Use initialLang (from local storage) to determine initial state
     const [index, setIndex] = useState(0);
     const [selectedLanguageCode, setSelectedLanguageCode] = useState(initialLang || null);
     const [languageSelected, setLanguageSelected] = useState(!!initialLang);
+
+    // --- Dynamic Text Lookup (CRITICAL FIX) ---
+    // If a language is selected, use its texts; otherwise, default to 'en' preview.
+    const langTexts = DUMMY_LANG_TEXTS[selectedLanguageCode] || DUMMY_LANG_TEXTS['en'];
+
 
     // Rotating messages in different languages
     const messages = [
@@ -66,7 +65,7 @@ const WelcomePage = ({ onLanguageSelect, texts, initialLang }) => {
         'అర్థికాలోకి స్వాగతం',
         'ਅਰਥਿਕਾ ਵਿੱਚ ਤੁਹਾਡਾ ਸੁਆਗਤ ਹੈ',
         'Welcome to Arthika',
-        'आर्टिका में खुशामदीद', // Urdu translation approximation
+        'آرتھیکا میں خوش آمدید', 
     ];
 
     // Language buttons
@@ -83,24 +82,44 @@ const WelcomePage = ({ onLanguageSelect, texts, initialLang }) => {
         { code: 'ur', label: 'اردو' },
     ];
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % messages.length);
-    }, 2000);
-    return () => clearInterval(interval);
-  }, []);
+    useEffect(() => {
+      const interval = setInterval(() => {
+        setIndex((prev) => (prev + 1) % messages.length);
+      }, 2000);
+      return () => clearInterval(interval);
+    }, [messages.length]);
 
-  
-  const handleClick = (lang) => {
-    onLanguageSelect(lang);
-    navigate('/login');
-  };
+
+    // --- HANDLER FUNCTIONS ---
+
+    // Handler for language selection buttons (Phase 1)
+    const handleLanguageClick = (code) => {
+        // 1. Visually mark selection
+        setSelectedLanguageCode(code);
+        // 2. Set language in App.js state & Local Storage
+        onLanguageSelect(code);
+        // 3. Move to Phase 2 (Show Action Buttons)
+        setLanguageSelected(true);
+    };
+
+    // Handler for Get Started button (Phase 2 - Primary Action)
+    const handleGetStartedClick = () => {
+        // CRITICAL: The first time, Get Started should take them to Registration or Home (if logged in).
+        // Since login is the next route in your App.js, we navigate to /login.
+        navigate('/register');
+    };
+
+    // Handler for Login button (Phase 2 - Secondary Action)
+    const handleLoginClick = () => {
+        navigate('/login');
+    };
+
 
     return (
         <div style={styles.container}>
             <h1 style={styles.title}>Arthika</h1>
 
-            {/* Content displayed after language selection */}
+            {/* --- Phase 2: Action Buttons (Language is selected) --- */}
             {languageSelected ? (
                 <>
                     <h2 style={styles.fadeText} key={selectedLanguageCode}>
@@ -127,12 +146,13 @@ const WelcomePage = ({ onLanguageSelect, texts, initialLang }) => {
                     </div>
                 </>
             ) : (
+                /* --- Phase 1: Language Selection --- */
                 <>
-                    {/* Content displayed before language selection */}
+                    {/* Rotating Message */}
                     <p style={styles.fadeText} key={index}>
                         {messages[index]}
                     </p>
-                    <p style={styles.chooseLanguageText}>{langTexts.chooseLanguage}</p>
+                    <p style={styles.chooseLanguageText}>Choose your Language</p>
 
                     <div style={styles.langGrid}>
                         {languages.map(({ code, label }) => (
@@ -160,7 +180,6 @@ const WelcomePage = ({ onLanguageSelect, texts, initialLang }) => {
 const styles = {
     container: {
         minHeight: '100vh',
-        // Subtle background gradient using Cream and a hint of soft Yellow
         background: `linear-gradient(to bottom, ${COLORS.background}, ${COLORS.softYellow})`,
         display: 'flex',
         flexDirection: 'column',
@@ -174,7 +193,7 @@ const styles = {
         fontSize: '48px',
         fontWeight: '900',
         marginBottom: '20px',
-        color: COLORS.secondary, // Yellow/Gold for professional title
+        color: COLORS.secondary,
         textShadow: `1px 1px 0 ${COLORS.dark}20`,
     },
     fadeText: {
@@ -182,7 +201,6 @@ const styles = {
         fontWeight: '600',
         color: COLORS.dark,
         marginBottom: '15px',
-        // Ensures smooth transition and prevents layout shift
         transition: 'opacity 0.5s ease-in-out, transform 0.5s',
         minHeight: '1.5em',
         maxWidth: '90%',
@@ -220,7 +238,6 @@ const styles = {
         textAlign: 'center',
         transition: 'transform 0.2s, box-shadow 0.2s, border-color 0.2s',
         minWidth: '80px',
-        // Hover effect: lifts slightly and changes box shadow color
         ':hover': {
             transform: 'translateY(-2px)',
             boxShadow: `0 4px 8px ${COLORS.primary}80`,
@@ -248,7 +265,6 @@ const styles = {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        // General hover effect
         ':hover': {
             transform: 'translateY(-1px)',
             opacity: 0.9,
@@ -256,7 +272,7 @@ const styles = {
         }
     },
     loginButton: {
-        backgroundColor: COLORS.secondary, // Yellow/Gold
+        backgroundColor: COLORS.secondary,
         color: COLORS.dark,
         boxShadow: `0 4px 10px ${COLORS.secondary}70`,
     },

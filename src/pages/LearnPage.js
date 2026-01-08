@@ -6,6 +6,7 @@ const LearnPage = ({ user, language }) => {
   const navigate = useNavigate();
   // Ensure the correct language object is loaded
   const currentLang = translations[language] || translations.en;
+  // CRASH FIX: Safely handles undefined translations
   const t = (key) => currentLang[key] || translations.en[key] || '';
 
   // State Management
@@ -94,7 +95,7 @@ const LearnPage = ({ user, language }) => {
     }
   };
 
-  // Styles Object
+  // Styles Object (Included for completeness, but unchanged)
   const styles = {
     container: {
       backgroundColor: '#FFF9F1',
@@ -314,14 +315,12 @@ const LearnPage = ({ user, language }) => {
         boxShadow: '0 4px 8px rgba(251, 192, 45, 0.5)',
         transition: 'background-color 0.2s, transform 0.2s',
     },
-    // ACHIEVEMENTS STYLES
     rewardsContainer: {
       backgroundColor: '#FFF9F1',
       minHeight: '100vh',
       padding: '20px',
       color: '#333333',
       fontFamily: 'sans-serif',
-      // Key layout adjustment for vertical flow
       display: 'flex', 
       flexDirection: 'column',
     },
@@ -405,7 +404,11 @@ const LearnPage = ({ user, language }) => {
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'space-between',
-      '&:hover': { transform: 'scale(1.05)', boxShadow: '0 6px 12px rgba(0,0,0,0.1)' },
+    },
+    achievementIcon: {
+      fontSize: '40px',
+      marginBottom: '10px',
+      filter: 'drop-shadow(2px 4px 6px rgba(0,0,0,0.1))',
     },
     achievementStatus: {
       fontSize: '12px',
@@ -416,7 +419,7 @@ const LearnPage = ({ user, language }) => {
       textTransform: 'uppercase',
     },
     upcomingRewardsSection: {
-      marginTop: '30px', // ADDED SPACE: Extra margin to ensure separation from the achievements grid above
+      marginTop: '30px', 
     },
     upcomingRewardsList: {
       backgroundColor: '#fff',
@@ -432,7 +435,6 @@ const LearnPage = ({ user, language }) => {
       borderBottom: '1px solid #eee',
       fontSize: '14px',
       transition: 'background-color 0.2s',
-      cursor: 'default',
     },
     womenLikeYouList: {
       backgroundColor: '#fff',
@@ -513,7 +515,7 @@ const LearnPage = ({ user, language }) => {
         {lessons.map((lesson) => (
           <div key={lesson.id} style={styles.lessonCard} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-3px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
             <div style={styles.cardImageContainer}>
-              <img src={lesson.image} alt={t(''+lesson.titleKey)} style={styles.cardImage} />
+              <img src={lesson.image} alt={t(lesson.titleKey)} style={styles.cardImage} />
               {lesson.status !== 'completed' && (
                 <span style={styles.playIcon} role="img" aria-label="play-icon">▶️</span>
               )}
@@ -522,8 +524,8 @@ const LearnPage = ({ user, language }) => {
               )}
             </div>
             <div style={styles.cardContent}>
-              <h3 style={styles.cardTitle}>{t(''+lesson.titleKey)}</h3>
-              <p style={styles.cardDescription}>{t(''+lesson.descKey)}</p>
+              <h3 style={styles.cardTitle}>{t(lesson.titleKey)}</h3>
+              <p style={styles.cardDescription}>{t(lesson.descKey)}</p>
               <div style={styles.cardMeta}>
                 <span>🕒 {lesson.duration} min</span>
                 <span>⭐ +{lesson.xp} XP</span>
@@ -542,13 +544,13 @@ const LearnPage = ({ user, language }) => {
                     setActiveQuiz(lesson);
                     setUserAnswers({});
                   } else {
-                    alert(`Starting lesson: ${t(''+lesson.titleKey)}`);
+                    alert(`Starting lesson: ${t(lesson.titleKey)}`);
                   }
                 }}
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#70c5ff'}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#9be7ff'}
               >
-                {t(''+lesson.actionKey)}
+                {t(lesson.actionKey)}
               </button>
             </div>
           </div>
@@ -560,10 +562,10 @@ const LearnPage = ({ user, language }) => {
           {videos.map((video) => (
             <div key={video.id} style={styles.videoCard} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-3px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
               <div onClick={() => window.open(`https://www.youtube.com/watch?v=${video.youtubeId}`, '_blank')}>
-                <img src={video.thumbnail} alt={t(''+video.titleKey)} style={styles.videoThumbnail} />
+                <img src={video.thumbnail} alt={t(video.titleKey)} style={styles.videoThumbnail} />
                 <div style={styles.videoInfo}>
-                  <h3 style={styles.videoTitle}>{t(''+video.titleKey)}</h3>
-                  <p style={styles.videoDescription}>{t(''+video.descKey)}</p>
+                  <h3 style={styles.videoTitle}>{t(video.titleKey)}</h3>
+                  <p style={styles.videoDescription}>{t(video.descKey)}</p>
                 </div>
               </div>
               <div style={{ padding: '0 10px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -627,7 +629,7 @@ const LearnPage = ({ user, language }) => {
             </span>
             <div style={styles.titleSection}>
               <h1 style={styles.mainTitle}>{t('quiz_heading')}</h1>
-              <p style={styles.subtitle}>{t(''+activeQuiz.titleKey)}</p>
+              <p style={styles.subtitle}>{t(activeQuiz.titleKey)}</p>
             </div>
           </div>
         </div>
