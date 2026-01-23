@@ -1,6 +1,6 @@
-// src/pages/RegisterPage.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios'; 
 
 const RegisterPage = ({ language }) => {
   const navigate = useNavigate();
@@ -19,13 +19,29 @@ const RegisterPage = ({ language }) => {
     setF({ ...f, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!f.name || !f.phone || !f.password) {
       alert(t('Please fill required fields', 'कृपया आवश्यक जानकारी भरें', 'कृपया आवश्यक माहिती भरा'));
       return;
     }
-    alert(t('Registered successfully!', 'पंजीकरण सफल!', 'नोंदणी यशस्वी!'));
-    navigate('/home');
+
+    try {
+      // UPDATED URL: Added '/users' to match your server.js route
+      const response = await axios.post('http://localhost:5000/api/users/register', f);
+      
+      if (response.status === 201 || response.status === 200) {
+        alert(t('Registered successfully!', 'पंजीकरण सफल!', 'नोंदणी यशस्वी!'));
+        navigate('/home');
+      }
+    } catch (error) {
+      console.error("Registration Error:", error);
+      // Detailed error alert to help you if the server is down
+      alert(t(
+        'Server Connection Failed! Ensure your backend terminal is running npm run dev.',
+        'सर्वर कनेक्शन विफल! सुनिश्चित करें कि आपका बैकएंड चल रहा है।',
+        'सर्व्हर कनेक्शन अयशस्वी! तुमचा बॅकएंड चालू असल्याची खात्री करा.'
+      ));
+    }
   };
 
   return (
